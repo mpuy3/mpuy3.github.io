@@ -1,183 +1,45 @@
-var app = document.getElementById("board")
+const canvas = document.getElementById('molecule-canvas');
+const ctx = canvas.getContext('2d');
 
-var grid = [
-  ["-", "-", "-"],
-  ["-", "-", "-"],
-  ["-", "-", "-"]
-]
-var round = "X"
+let selectedAtomType = null;
+let atoms = [];
 
-var board = grid.map((line, lineIndex) => {
-  return line.map((cell, cellIndex) => {
-    return `<button id="${lineIndex}${cellIndex}" onclick="X_Or_O(${lineIndex}, ${cellIndex})">${cell}</button>`
-  }).join("")
-}).join("<br>")
-
-app.innerHTML = board
-
-function X_Or_O(line, cell) {
-  if(round == "X") {
-    grid[line][cell] = round
-    document.getElementById(`${line}${cell}`).innerHTML = grid[line][cell]
-    document.getElementById(`${line}${cell}`).setAttribute("disabled", true)
-    round = "O"
-  } else {
-    grid[line][cell] = round
-    document.getElementById(`${line}${cell}`).innerHTML = grid[line][cell]
-    document.getElementById(`${line}${cell}`).setAttribute("disabled", true)
-    round = "X"
+canvas.addEventListener('click', (event) => {
+  const x = event.clientX - canvas.offsetLeft;
+  const y = event.clientY - canvas.offsetTop;
+  if (selectedAtomType != null) {
+  atoms.push({ type: selectedAtomType, x, y });
+  drawMolecule();
   }
-  checkForSequence()
+});
+
+const controls = document.getElementById('controls');
+controls.addEventListener('click', (event) => {
+  const target = event.target;
+  console.log(target.tagName);
+  if (target.tagName === 'LI') {
+    selectedAtomType = target.id;
+    console.log(target.id);
+  }
+});
+
+function drawAtom(atom) {
+  ctx.beginPath();
+  ctx.arc(atom.x, atom.y, 10, 0, 2 * Math.PI);
+  ctx.fillStyle = 'black';
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = 'white';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '12px Arial';
+  ctx.fillText(atom.type, atom.x, atom.y);
 }
 
-function resetGame() {
-  grid.forEach((line, line_index) => {
-    line.forEach((cell, cell_index) => {
-      document.getElementById(`${line_index}${cell_index}`).innerHTML = "-"
-      document.getElementById(`${line_index}${cell_index}`).removeAttribute("disabled")
-    })
-  })
-  grid = [
-    ["-", "-", "-"],
-    ["-", "-", "-"],
-    ["-", "-", "-"]
-  ]
-  round = "X"
-  document.getElementById("message").innerHTML = ""
+function drawMolecule() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  atoms.forEach(drawAtom);
 }
 
-function disableAll() {
-  grid.forEach((line, line_index) => {
-    line.forEach((cell, cell_index) => {
-      document.getElementById(`${line_index}${cell_index}`).setAttribute("disabled", true)
-    })
-  })
-}
-
-function checkForSequence() {
-  //Check if O is the winner
-  if(grid[0][0] == "O" && grid[0][1] == "O" && grid[0][2] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[1][0] == "O" && grid[1][1] == "O" && grid[1][2] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[2][0] == "O" && grid[2][1] == "O" && grid[2][2] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][0] == "O" && grid[1][0] == "O" && grid[2][0] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][1] == "O" && grid[1][1] == "O" && grid[2][1] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][2] == "O" && grid[1][2] == "O" && grid[2][2] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][0] == "O" && grid[1][1] == "O" && grid[2][2] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][2] == "O" && grid[1][1] == "O" && grid[2][0] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  
-  //Check if X is the winner
-  if(grid[0][0] == "X" && grid[0][1] == "X" && grid[0][2] == "X") {
-    document.getElementById("message").innerHTML = "X is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[1][0] == "X" && grid[1][1] == "X" && grid[1][2] == "X") {
-    document.getElementById("message").innerHTML = "X is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[2][0] == "X" && grid[2][1] == "X" && grid[2][2] == "X") {
-    document.getElementById("message").innerHTML = "X is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][0] == "X" && grid[1][0] == "X" && grid[2][0] == "X") {
-    document.getElementById("message").innerHTML = "X is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][1] == "X" && grid[1][1] == "X" && grid[2][1] == "X") {
-    document.getElementById("message").innerHTML = "X is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][2] == "X" && grid[1][2] == "X" && grid[2][2] == "X") {
-    document.getElementById("message").innerHTML = "X is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][0] == "X" && grid[1][1] == "X" && grid[2][2] == "X") {
-    document.getElementById("message").innerHTML = "X is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][2] == "X" && grid[1][1] == "X" && grid[2][0] == "X") {
-    document.getElementById("message").innerHTML = "X is the Winner!!!"
-    disableAll()
-    return
-  }
-  
-  //Check if O is the winner
-  if(grid[0][0] == "O" && grid[0][1] == "O" && grid[0][2] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[1][0] == "O" && grid[1][1] == "O" && grid[1][2] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[2][0] == "O" && grid[2][1] == "O" && grid[2][2] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][0] == "O" && grid[1][0] == "O" && grid[2][0] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][1] == "O" && grid[1][1] == "O" && grid[2][1] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][2] == "O" && grid[1][2] == "O" && grid[2][2] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][0] == "O" && grid[1][1] == "O" && grid[2][2] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-  if(grid[0][2] == "O" && grid[1][1] == "O" && grid[2][0] == "O") {
-    document.getElementById("message").innerHTML = "O is the Winner!!!"
-    disableAll()
-    return
-  }
-}
+drawMolecule();
